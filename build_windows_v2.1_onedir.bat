@@ -1,11 +1,11 @@
 @echo off
 REM ==============================================================================
-REM abcConverter v2.1.0 - Windows Build Script (--onedir mode for USD)
+REM abcConverter v2.2.0 - Windows Build Script (--onedir mode for USD)
 REM Creates a directory with executable and dependencies
 REM ==============================================================================
 
 echo ====================================
-echo Building abcConverter v2.1.0
+echo Building abcConverter v2.2.0
 echo ====================================
 echo.
 
@@ -89,6 +89,7 @@ REM Using --onedir instead of --onefile for better USD DLL support
     --hidden-import=exporters.base_exporter ^
     --hidden-import=exporters.ae_exporter ^
     --hidden-import=exporters.usd_exporter ^
+    --hidden-import=exporters.maya_ma_exporter ^
     --hidden-import=alembic ^
     --hidden-import=alembic.Abc ^
     --hidden-import=alembic.AbcGeom ^
@@ -145,9 +146,11 @@ echo   ✓ After Effects JSX + OBJ export
 if "%USD_AVAILABLE%"=="YES" (
     echo   ✓ USD .usdc export
     echo   ✓ Maya USD export
+    echo   ✓ Maya MA export
 ) else (
     echo   ✗ USD export (library not found)
     echo   ✗ Maya export (library not found)
+    echo   ✓ Maya MA export
 )
 
 echo.

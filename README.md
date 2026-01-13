@@ -1,12 +1,12 @@
 # abcConverter
 
-**Version 2.1.0**
+**Version 2.2.0**
 
 Convert Alembic (.abc) files to After Effects JSX, USD, and Maya formats with intelligent vertex animation detection.
 
 ## Features
 
-- **Multi-Format Export** - After Effects JSX + OBJ, USD (.usdc), Maya USD
+- **Multi-Format Export** - After Effects JSX + OBJ, USD (.usdc), Maya USD, Maya MA
 - **Animation Intelligence** - Auto-detects vertex deformation vs transform-only animation
 - **Multi-DCC Support** - Works with Alembic from SynthEyes, Nuke, Maya, Houdini, and more
 - **Cameras & Geometry** - Full animation support with automatic coordinate conversion
@@ -69,21 +69,25 @@ python a2j.py --help
 output_dir/
 ├── shot_010_ae/    # After Effects (JSX + OBJ)
 ├── shot_010_usd/   # USD export (.usdc)
-└── shot_010_maya/  # Maya USD (.usdc)
+└── shot_010_maya/  # Maya export
+    ├── shot_010.usdc  # Maya USD
+    └── shot_010.ma    # Maya MA (ASCII)
 ```
 
 See [MACOS_SETUP.md](MACOS_SETUP.md) for detailed CLI documentation.
 
 ## What Gets Exported
 
-| Element | After Effects | USD / Maya |
-|---------|---------------|------------|
-| Cameras | 3D Camera with full animation | UsdGeom.Camera |
-| Meshes (transform-only) | 3D Null + OBJ | UsdGeom.Mesh |
-| Meshes (vertex animation) | Skipped (not supported) | Time-sampled vertices |
-| Locators/Trackers | 3D Null (yellow, shy) | Xform nodes |
+| Element | After Effects | USD / Maya USD | Maya MA |
+|---------|---------------|----------------|---------|
+| Cameras | 3D Camera with full animation | UsdGeom.Camera | Camera node + animCurves |
+| Meshes (transform-only) | 3D Null + OBJ | UsdGeom.Mesh | Mesh + animCurves |
+| Meshes (vertex animation) | Skipped (not supported) | Time-sampled vertices | AlembicNode reference |
+| Locators/Trackers | 3D Null (yellow, shy) | Xform nodes | Transform nodes |
 
-**Note:** Coordinate system conversion handled automatically (Y-up to Y-down for AE).
+**Note:**
+- Coordinate system conversion handled automatically (Y-up to Y-down for AE)
+- Maya MA uses Alembic references for vertex animation (requires original .abc file)
 
 ## Requirements
 
@@ -115,7 +119,7 @@ End users need **Visual C++ Redistributable 2015-2022** (Windows only): https://
 ```
 alembic_to_jsx/
 ├── core/              # Core utilities (Alembic reader, animation detection)
-├── exporters/         # Format exporters (AE, USD)
+├── exporters/         # Format exporters (AE, USD, Maya MA)
 ├── alembic_converter.py  # Main orchestrator
 ├── a2j_gui.py         # GUI application
 ├── a2j.py             # CLI application

@@ -37,13 +37,14 @@ def build():
         '--windowed',  # No console window (GUI mode)
         '--clean',
         '--noconfirm',
-        # Include hidden imports - v2.1.0 modular architecture
+        # Include hidden imports - v2.2.0 modular architecture
         '--hidden-import=alembic_converter',
         '--hidden-import=core.alembic_reader',
         '--hidden-import=core.animation_detector',
         '--hidden-import=exporters.base_exporter',
         '--hidden-import=exporters.ae_exporter',
         '--hidden-import=exporters.usd_exporter',
+        '--hidden-import=exporters.maya_ma_exporter',
         # Alembic library
         '--hidden-import=alembic',
         '--hidden-import=alembic.Abc',

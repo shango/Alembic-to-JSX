@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-abcConverter v2.1.0 - Command Line Version
-Multi-format Alembic converter (After Effects, USD, Maya)
+abcConverter v2.2.0 - Command Line Version
+Multi-format Alembic converter (After Effects, USD, Maya MA)
 """
 
 import argparse
@@ -15,7 +15,7 @@ from alembic_converter import AlembicToJSXConverter
 def main():
     parser = argparse.ArgumentParser(
         prog='abcConverter',
-        description='Convert Alembic (.abc) files to multiple formats (After Effects JSX, USD, Maya)',
+        description='Convert Alembic (.abc) files to multiple formats (After Effects JSX, USD, Maya MA)',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -32,21 +32,22 @@ Examples:
   python a2j.py input.abc output.jsx --fps 24 --frames 120
 
 Format descriptions:
-  ae    - After Effects JSX + OBJ (skips vertex-animated meshes)
-  usd   - USD .usdc binary format (with vertex animation support)
-  maya  - Maya USD .usdc format (Maya 2022+ compatible)
+  ae       - After Effects JSX + OBJ (skips vertex-animated meshes)
+  usd      - USD .usdc binary format (with vertex animation support)
+  maya     - Maya USD .usdc format (Maya 2022+ compatible)
+  maya_ma  - Maya MA .ma native ASCII (references Alembic for vertex animation)
         """
     )
 
     parser.add_argument('input', type=str, help='Input Alembic (.abc) file path')
     parser.add_argument('output', type=str, nargs='?',
-                       help='[Legacy] Output JSX file OR use --output-dir for v2.1.0')
+                       help='[Legacy] Output JSX file OR use --output-dir for v2.2.0')
     parser.add_argument('--output-dir', type=str,
                        help='Output directory for all formats (creates subfolders per format)')
     parser.add_argument('--shot-name', type=str,
                        help='Shot name for files/folders (default: derived from input filename)')
-    parser.add_argument('--format', nargs='+', choices=['ae', 'usd', 'maya'],
-                       default=['ae', 'usd', 'maya'],
+    parser.add_argument('--format', nargs='+', choices=['ae', 'usd', 'maya', 'maya_ma'],
+                       default=['ae', 'usd', 'maya', 'maya_ma'],
                        help='Formats to export (default: all formats)')
     parser.add_argument('--fps', type=int, default=24,
                        help='Frame rate (default: 24)')
@@ -76,7 +77,7 @@ Format descriptions:
             legacy_mode = True
             output_jsx = args.output
             print("Running in legacy mode (v2.0.0 compatibility)")
-            print("Note: Use --output-dir for v2.1.0 multi-format export\n")
+            print("Note: Use --output-dir for v2.2.0 multi-format export\n")
         else:
             # Assume it's a directory
             args.output_dir = args.output
@@ -145,10 +146,11 @@ Format descriptions:
             sys.exit(1)
 
     else:
-        # New v2.1.0 multi-format mode
+        # New v2.2.0 multi-format mode
         export_ae = 'ae' in args.format
         export_usd = 'usd' in args.format
         export_maya = 'maya' in args.format
+        export_maya_ma = 'maya_ma' in args.format
 
         formats_str = ', '.join(args.format)
 
@@ -161,7 +163,8 @@ Format descriptions:
                 frame_count=frame_count,
                 export_ae=export_ae,
                 export_usd=export_usd,
-                export_maya=export_maya
+                export_maya=export_maya,
+                export_maya_ma=export_maya_ma
             )
 
             # Check results
@@ -178,6 +181,9 @@ Format descriptions:
 
                 if 'maya' in results and results['maya'].get('success'):
                     print(f"✓ Maya: {results['maya']['usd_file']}")
+
+                if 'maya_ma' in results and results['maya_ma'].get('success'):
+                    print(f"✓ Maya MA: {results['maya_ma']['ma_file']}")
 
                 print("="*60)
             else:

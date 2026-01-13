@@ -1,6 +1,6 @@
 ================================================================================
 abcConverter - Multi-Format Alembic Converter
-User Guide Version 2.1.0
+User Guide Version 2.2.0
 ================================================================================
 
 WHAT IS THIS?
@@ -9,6 +9,7 @@ Converts Alembic (.abc) files to multiple formats:
   • After Effects JSX + OBJ - Cameras, transforms, locators
   • USD (.usdc) - Full 3D scenes with vertex animation
   • Maya USD (.usdc) - Maya-optimized USD export
+  • Maya MA (.ma) - Native Maya ASCII with Alembic references
 
 Perfect for VFX workflows across SynthEyes, Nuke, Maya, Houdini, and more.
 
@@ -39,6 +40,7 @@ HOW TO USE
       ☑ After Effects (JSX + OBJ)
       ☑ USD (.usdc)
       ☑ Maya USD (.usdc)
+      ☑ Maya MA (.ma) - Native Maya ASCII
 
 5. Configure Settings (auto-detected from file)
    • Shot Name: Auto-filled from filename
@@ -63,8 +65,9 @@ output_folder/
 │   └── *.obj
 ├── shotname_usd/     # USD export
 │   └── shotname.usdc
-└── shotname_maya/    # Maya export
-    └── shotname.usdc
+└── shotname_maya/    # Maya export (both formats)
+    ├── shotname.usdc # Maya USD
+    └── shotname.ma   # Maya MA (ASCII)
 
 ================================================================================
 
@@ -82,7 +85,7 @@ Coordinate conversion handled automatically!
 COMPATIBILITY
 -------------
 • After Effects 2025 / 2024
-• Maya 2022+ (USD support)
+• Maya 2020+ (MA format), 2022+ (USD support)
 • Houdini (USD import)
 • Python 3.11/3.12 (if building from source)
 
@@ -90,7 +93,7 @@ COMPATIBILITY
 
 VERSION INFORMATION
 -------------------
-Version: 2.1.0
+Version: 2.2.0
 License: MIT
 Support: Open issues at project repository
 

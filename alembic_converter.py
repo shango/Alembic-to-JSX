@@ -13,6 +13,7 @@ from core.animation_detector import AnimationDetector
 # Import exporters
 from exporters.ae_exporter import AfterEffectsExporter
 from exporters.usd_exporter import USDExporter
+from exporters.maya_ma_exporter import MayaMAExporter
 
 
 class AlembicToJSXConverter:
@@ -27,6 +28,7 @@ class AlembicToJSXConverter:
     - After Effects JSX + OBJ (skips vertex-animated meshes)
     - USD .usdc (with vertex animation support)
     - Maya USD .usdc (reuses USD exporter)
+    - Maya MA .ma (native Maya ASCII with Alembic references)
     """
 
     def __init__(self, progress_callback=None):
@@ -45,10 +47,10 @@ class AlembicToJSXConverter:
         print(message)
 
     def convert_multi_format(self, abc_file, output_dir, shot_name, fps=24, frame_count=None,
-                            export_ae=True, export_usd=True, export_maya=True):
+                            export_ae=True, export_usd=True, export_maya=True, export_maya_ma=True):
         """Convert Alembic to multiple formats
 
-        This is the main entry point for v2.1.0 multi-format export.
+        This is the main entry point for v2.2.0 multi-format export.
 
         Args:
             abc_file: Path to input Alembic (.abc) file
@@ -59,6 +61,7 @@ class AlembicToJSXConverter:
             export_ae: Export to After Effects JSX + OBJ
             export_usd: Export to USD (.usdc)
             export_maya: Export to Maya USD (.usdc)
+            export_maya_ma: Export to Maya MA (.ma)
 
         Returns:
             dict: Results with keys:
@@ -66,11 +69,12 @@ class AlembicToJSXConverter:
                 - 'ae': AE export results (if export_ae=True)
                 - 'usd': USD export results (if export_usd=True)
                 - 'maya': Maya export results (if export_maya=True)
+                - 'maya_ma': Maya MA export results (if export_maya_ma=True)
                 - 'message': Summary message
         """
         try:
             self.log(f"\n{'='*60}")
-            self.log(f"abcConverter v2.1.0 - Multi-Format Export")
+            self.log(f"abcConverter v2.2.0 - Multi-Format Export")
             self.log(f"{'='*60}")
             self.log(f"Input: {abc_file}")
             self.log(f"Output: {output_dir}")
@@ -123,19 +127,29 @@ class AlembicToJSXConverter:
                 exporter = USDExporter(self.progress_callback)
                 results['usd'] = exporter.export(reader, usd_dir, shot_name, fps, frame_count, animation_data)
 
-            # Export to Maya (uses USD exporter)
+            # Export to Maya (both USD and MA in same folder)
+            maya_dir = output_path / f"{shot_name}_maya"
+
             if export_maya:
                 self.log(f"\n--- Maya USD Export ---")
-                maya_dir = output_path / f"{shot_name}_maya"
                 exporter = USDExporter(self.progress_callback)
                 results['maya'] = exporter.export(reader, maya_dir, shot_name, fps, frame_count, animation_data)
+
+            if export_maya_ma:
+                self.log(f"\n--- Maya MA Export ---")
+                exporter = MayaMAExporter(self.progress_callback)
+                # Pass original Alembic path for vertex animation references
+                results['maya_ma'] = exporter.export(
+                    reader, maya_dir, shot_name, fps, frame_count, animation_data,
+                    abc_file_path=str(Path(abc_file).resolve())
+                )
 
             # Step 4: Summary
             self.log(f"\n{'='*60}")
             self.log(f"Export Complete!")
             self.log(f"{'='*60}")
 
-            success_count = sum(1 for key in ['ae', 'usd', 'maya']
+            success_count = sum(1 for key in ['ae', 'usd', 'maya', 'maya_ma']
                               if key in results and results[key].get('success', False))
 
             results['success'] = success_count > 0
@@ -151,6 +165,9 @@ class AlembicToJSXConverter:
             if 'maya' in results:
                 status = "✓" if results['maya'].get('success') else "✗"
                 self.log(f"  {status} Maya: {results['maya'].get('message', 'N/A')}")
+            if 'maya_ma' in results:
+                status = "✓" if results['maya_ma'].get('success') else "✗"
+                self.log(f"  {status} Maya MA: {results['maya_ma'].get('message', 'N/A')}")
 
             self.log(f"\n{results['message']}")
             self.log(f"{'='*60}\n")

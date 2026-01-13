@@ -20,7 +20,7 @@ class AlembicToJSXGUI:
 
     def __init__(self, root):
         self.root = root
-        self.root.title("abcConverter v2.1.0")
+        self.root.title("abcConverter v2.2.0")
         self.root.geometry("650x900")
         self.root.resizable(False, False)
 
@@ -53,6 +53,7 @@ class AlembicToJSXGUI:
         self.export_ae = tk.BooleanVar(value=True)
         self.export_usd = tk.BooleanVar(value=True)
         self.export_maya = tk.BooleanVar(value=True)
+        self.export_maya_ma = tk.BooleanVar(value=True)
 
         self.setup_theme()
         self.setup_ui()
@@ -138,11 +139,11 @@ class AlembicToJSXGUI:
                          style='Title.TLabel')
         title.pack(pady=(25, 5))
 
-        version = ttk.Label(self.root, text="v2.1.0",
+        version = ttk.Label(self.root, text="v2.2.0",
                            style='Subtitle.TLabel')
         version.pack(pady=(0, 5))
 
-        subtitle = ttk.Label(self.root, text="Multi-Format Alembic Converter (AE, USD, Maya)",
+        subtitle = ttk.Label(self.root, text="Multi-Format Alembic Converter (AE, USD, Maya MA)",
                             style='Subtitle.TLabel')
         subtitle.pack(pady=(0, 15))
 
@@ -225,6 +226,14 @@ class AlembicToJSXGUI:
                                     activebackground=self.colors['bg'], activeforeground=self.colors['text'],
                                     font=('Segoe UI', 10), cursor='hand2')
         maya_check.grid(row=2, column=0, sticky=tk.W, pady=3)
+
+        maya_ma_check = tk.Checkbutton(format_frame, text="☑ Maya MA (.ma) - Native Maya ASCII",
+                                       variable=self.export_maya_ma,
+                                       bg=self.colors['bg'], fg=self.colors['text'],
+                                       selectcolor=self.colors['entry_bg'],
+                                       activebackground=self.colors['bg'], activeforeground=self.colors['text'],
+                                       font=('Segoe UI', 10), cursor='hand2')
+        maya_ma_check.grid(row=3, column=0, sticky=tk.W, pady=3)
 
         # Convert button (larger and prominent)
         self.convert_btn = tk.Button(main_frame, text="⚡ Convert Multi-Format", command=self.start_conversion,
@@ -309,7 +318,7 @@ class AlembicToJSXGUI:
             return
 
         # Check if at least one format is selected
-        if not (self.export_ae.get() or self.export_usd.get() or self.export_maya.get()):
+        if not (self.export_ae.get() or self.export_usd.get() or self.export_maya.get() or self.export_maya_ma.get()):
             messagebox.showerror("Error", "Please select at least one export format")
             return
 
@@ -338,7 +347,8 @@ class AlembicToJSXGUI:
                 frame_count=self.frame_count.get(),
                 export_ae=self.export_ae.get(),
                 export_usd=self.export_usd.get(),
-                export_maya=self.export_maya.get()
+                export_maya=self.export_maya.get(),
+                export_maya_ma=self.export_maya_ma.get()
             )
 
             if results.get('success'):
@@ -356,6 +366,10 @@ class AlembicToJSXGUI:
                 if 'maya' in results and results['maya'].get('success'):
                     maya_file = results['maya']['usd_file']
                     message_lines.append(f"✓ Maya: {maya_file}")
+
+                if 'maya_ma' in results and results['maya_ma'].get('success'):
+                    maya_ma_file = results['maya_ma']['ma_file']
+                    message_lines.append(f"✓ Maya MA: {maya_ma_file}")
 
                 message_lines.append("\nSee Progress Log for details.")
 
