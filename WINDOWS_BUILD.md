@@ -1,6 +1,6 @@
 # Windows Build Instructions
 
-Complete guide for building MultiConverter v2.5.0 on Windows.
+Complete guide for building MultiConverter v2.6.1 on Windows.
 
 ## Prerequisites
 
@@ -68,7 +68,7 @@ This single file contains:
 **Users need to:**
 1. Install Visual C++ Redistributable (if not already installed)
 2. Run `MultiConverter.exe`
-3. Use the GUI to convert to After Effects, USD, or Maya!
+3. Use the GUI to convert to After Effects, USD, Maya, or FBX!
 
 No Python installation needed for end users!
 

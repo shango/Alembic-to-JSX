@@ -9,6 +9,7 @@ v2.5.0 - Refactored to use SceneData instead of reader objects.
 """
 
 import os
+import re
 from pathlib import Path
 
 from .base_exporter import BaseExporter
@@ -305,10 +306,11 @@ class AfterEffectsExporter(BaseExporter):
         # Calculate AE zoom value
         ae_zoom = focal_length * comp_width / h_aperture
 
-        layer_var = f"camera_{name.replace(' ', '_').replace('-', '_')}"
+        layer_var = f"camera_{self._sanitize_var_name(name)}"
+        layer_name = self._escape_layer_name(name)
 
         # Create camera
-        jsx.append(f"var {layer_var} = comp.layers.addCamera('{name}', [0, 0]);")
+        jsx.append(f"var {layer_var} = comp.layers.addCamera('{layer_name}', [0, 0]);")
         jsx.append(f"{layer_var}.autoOrient = AutoOrientType.NO_AUTO_ORIENT;")
 
         # Generate array definitions
@@ -351,10 +353,12 @@ class AfterEffectsExporter(BaseExporter):
     def _process_geometry(self, mesh, name, frame_count, fps, output_dir, comp_width, comp_height):
         """Process geometry mesh with OBJ export and transform"""
         jsx = []
-        layer_var = f"mesh_{name.replace(' ', '_').replace('-', '_')}"
+        layer_var = f"mesh_{self._sanitize_var_name(name)}"
+        layer_name = self._escape_layer_name(name)
 
-        # Export OBJ from SceneData geometry
-        obj_filename = f"{name}.obj"
+        # Export OBJ from SceneData geometry - use sanitized name for filename
+        safe_filename = self._sanitize_var_name(name)
+        obj_filename = f"{safe_filename}.obj"
         obj_path = os.path.join(output_dir, obj_filename)
         self._export_mesh_to_obj(mesh, obj_path)
 
@@ -365,7 +369,7 @@ class AfterEffectsExporter(BaseExporter):
         jsx.append(f"objFootage.selected = false;")
         jsx.append(f"app.beginSuppressDialogs();")
         jsx.append(f"var {layer_var} = comp.layers.add(objFootage);")
-        jsx.append(f"{layer_var}.name = '{name}';")
+        jsx.append(f"{layer_var}.name = '{layer_name}';")
         jsx.append(f"app.endSuppressDialogs(true);")
 
         # Set anchor point to [0,0,0]
@@ -434,10 +438,11 @@ class AfterEffectsExporter(BaseExporter):
     def _process_locator(self, transform, name, frame_count, fps, comp_width, comp_height):
         """Process locator/transform as 3D null"""
         jsx = []
-        layer_var = f"locator_{name.replace(' ', '_').replace('-', '_')}"
+        layer_var = f"locator_{self._sanitize_var_name(name)}"
+        layer_name = self._escape_layer_name(name)
 
         jsx.append(f"var {layer_var} = comp.layers.addNull();")
-        jsx.append(f"{layer_var}.name = '{name}';")
+        jsx.append(f"{layer_var}.name = '{layer_name}';")
         jsx.append(f"{layer_var}.threeDLayer = true;")
         jsx.append(f"{layer_var}.shy = true;")
         jsx.append(f"{layer_var}.label = 13;")  # 13 = yellow in AE
@@ -517,3 +522,25 @@ class AfterEffectsExporter(BaseExporter):
         except Exception as e:
             self.log(f"Warning: Could not export mesh to OBJ: {e}")
             return False
+
+    def _sanitize_var_name(self, name):
+        """Sanitize a name for use as a JavaScript variable name
+
+        JavaScript variable names can only contain letters, digits, underscores, and $.
+        They cannot start with a digit.
+        """
+        # Replace all non-alphanumeric characters with underscore
+        sanitized = re.sub(r'[^a-zA-Z0-9_]', '_', name)
+        # Ensure it doesn't start with a digit
+        if sanitized and sanitized[0].isdigit():
+            sanitized = f"obj_{sanitized}"
+        return sanitized or "unnamed"
+
+    def _escape_layer_name(self, name):
+        """Escape a name for use in a JavaScript string literal
+
+        Escapes quotes and backslashes for safe use in JSX strings.
+        """
+        # Escape backslashes first, then single quotes
+        escaped = name.replace('\\', '\\\\').replace("'", "\\'")
+        return escaped

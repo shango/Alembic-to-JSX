@@ -28,7 +28,7 @@ class MultiConverterGUI:
 
     def __init__(self, root):
         self.root = root
-        self.root.title("MultiConverter v2.5.0 - VFX-Experts")
+        self.root.title("MultiConverter v2.6.1 - VFX-Experts")
         self.root.geometry("500x780")
         self.root.resizable(False, False)
 
@@ -56,6 +56,7 @@ class MultiConverterGUI:
         self.export_usd = tk.BooleanVar(value=True)
         self.export_maya = tk.BooleanVar(value=True)
         self.export_maya_ma = tk.BooleanVar(value=True)
+        self.export_fbx = tk.BooleanVar(value=True)
 
         self.setup_ui()
 
@@ -72,7 +73,7 @@ class MultiConverterGUI:
         title = ttk.Label(header_frame, text="MultiConverter", font=('Segoe UI', 20, 'bold'))
         title.pack()
 
-        version = ttk.Label(header_frame, text="v2.5.0", font=('Segoe UI', 10))
+        version = ttk.Label(header_frame, text="v2.6.1", font=('Segoe UI', 10))
         version.pack()
 
         subtitle = ttk.Label(header_frame, text="VFX-Experts  |  Scene Converter - Alembic/USD to AE, USD, Maya",
@@ -142,6 +143,10 @@ class MultiConverterGUI:
         maya_ma_check = ttk.Checkbutton(format_frame, text="Maya MA (.ma)",
                                         variable=self.export_maya_ma)
         maya_ma_check.pack(anchor=tk.W, pady=3)
+
+        fbx_check = ttk.Checkbutton(format_frame, text="FBX (.fbx) - Unreal Engine",
+                                    variable=self.export_fbx)
+        fbx_check.pack(anchor=tk.W, pady=3)
 
         # Progress bar
         progress_frame = ttk.Frame(convert_tab)
@@ -252,7 +257,7 @@ class MultiConverterGUI:
             return
 
         # Check if at least one format is selected
-        if not (self.export_ae.get() or self.export_usd.get() or self.export_maya.get() or self.export_maya_ma.get()):
+        if not (self.export_ae.get() or self.export_usd.get() or self.export_maya.get() or self.export_maya_ma.get() or self.export_fbx.get()):
             messagebox.showerror("Error", "Please select at least one export format")
             return
 
@@ -283,7 +288,8 @@ class MultiConverterGUI:
                 export_ae=self.export_ae.get(),
                 export_usd=self.export_usd.get(),
                 export_maya=self.export_maya.get(),
-                export_maya_ma=self.export_maya_ma.get()
+                export_maya_ma=self.export_maya_ma.get(),
+                export_fbx=self.export_fbx.get()
             )
 
             if results.get('success'):
@@ -305,6 +311,10 @@ class MultiConverterGUI:
                 if 'maya_ma' in results and results['maya_ma'].get('success'):
                     maya_ma_file = results['maya_ma']['ma_file']
                     message_lines.append(f"Maya MA: {maya_ma_file}")
+
+                if 'fbx' in results and results['fbx'].get('success'):
+                    fbx_file = results['fbx']['fbx_file']
+                    message_lines.append(f"FBX: {fbx_file}")
 
                 self.root.after(0, lambda: messagebox.showinfo(
                     "Success",

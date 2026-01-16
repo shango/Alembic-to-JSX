@@ -4,7 +4,7 @@ Multi-Format Scene Converter - Main Orchestrator Module
 Coordinates multi-format export using modular readers and exporters
 Supports Alembic (.abc) and USD (.usd, .usda, .usdc) input
 
-v2.5.0 - SceneData architecture: readers extract all data into format-agnostic
+v2.6.1 - SceneData architecture: readers extract all data into format-agnostic
 structure, exporters work only with SceneData (no direct reader access).
 """
 
@@ -17,6 +17,7 @@ from readers import create_reader, get_file_type, AlembicReader
 from exporters.ae_exporter import AfterEffectsExporter
 from exporters.usd_exporter import USDExporter
 from exporters.maya_ma_exporter import MayaMAExporter
+from exporters.fbx_exporter import FBXExporter
 
 
 class AlembicToJSXConverter:
@@ -54,7 +55,8 @@ class AlembicToJSXConverter:
         print(message)
 
     def convert_multi_format(self, input_file, output_dir, shot_name, fps=24, frame_count=None,
-                            export_ae=True, export_usd=True, export_maya=True, export_maya_ma=True):
+                            export_ae=True, export_usd=True, export_maya=True, export_maya_ma=True,
+                            export_fbx=True):
         """Convert scene file to multiple formats
 
         This is the main entry point for v2.5.0 multi-format export.
@@ -70,6 +72,7 @@ class AlembicToJSXConverter:
             export_usd: Export to USD (.usdc)
             export_maya: Export to Maya USD (.usdc)
             export_maya_ma: Export to Maya MA (.ma)
+            export_fbx: Export to FBX (.fbx) for Unreal Engine
 
         Returns:
             dict: Results with keys:
@@ -78,6 +81,7 @@ class AlembicToJSXConverter:
                 - 'usd': USD export results (if export_usd=True)
                 - 'maya': Maya export results (if export_maya=True)
                 - 'maya_ma': Maya MA export results (if export_maya_ma=True)
+                - 'fbx': FBX export results (if export_fbx=True)
                 - 'message': Summary message
         """
         try:
@@ -87,7 +91,7 @@ class AlembicToJSXConverter:
             format_name = "Alembic" if file_type == 'alembic' else "USD"
 
             self.log(f"\n{'='*60}")
-            self.log(f"MultiConverter v2.5.0 - VFX-Experts")
+            self.log(f"MultiConverter v2.6.1 - VFX-Experts")
             self.log(f"{'='*60}")
             self.log(f"Input: {input_file} ({format_name})")
             self.log(f"Output: {output_dir}")
@@ -163,12 +167,19 @@ class AlembicToJSXConverter:
                 exporter = MayaMAExporter(self.progress_callback)
                 results['maya_ma'] = exporter.export(scene_data, maya_dir, shot_name)
 
+            # Export to FBX (for Unreal Engine)
+            if export_fbx:
+                self.log(f"\n--- FBX Export (Unreal Engine) ---")
+                fbx_dir = output_path / f"{shot_name}_fbx"
+                exporter = FBXExporter(self.progress_callback)
+                results['fbx'] = exporter.export(scene_data, fbx_dir, shot_name)
+
             # Step 4: Summary
             self.log(f"\n{'='*60}")
             self.log(f"Export Complete!")
             self.log(f"{'='*60}")
 
-            success_count = sum(1 for key in ['ae', 'usd', 'maya', 'maya_ma']
+            success_count = sum(1 for key in ['ae', 'usd', 'maya', 'maya_ma', 'fbx']
                               if key in results and results[key].get('success', False))
 
             results['success'] = success_count > 0
@@ -187,6 +198,9 @@ class AlembicToJSXConverter:
             if 'maya_ma' in results:
                 status = "✓" if results['maya_ma'].get('success') else "✗"
                 self.log(f"  {status} Maya MA: {results['maya_ma'].get('message', 'N/A')}")
+            if 'fbx' in results:
+                status = "✓" if results['fbx'].get('success') else "✗"
+                self.log(f"  {status} FBX: {results['fbx'].get('message', 'N/A')}")
 
             self.log(f"\n{results['message']}")
             self.log(f"{'='*60}\n")

@@ -1,12 +1,12 @@
 @echo off
 REM ==============================================================================
-REM MultiConverter v2.5.0 - Windows Build Script (--onefile mode)
+REM MultiConverter v2.6.1 - Windows Build Script (--onefile mode)
 REM Creates a single standalone .exe file
 REM NOTE: --onefile may have issues with USD DLLs - use --onedir if problems occur
 REM ==============================================================================
 
 echo ====================================
-echo Building MultiConverter v2.5.0
+echo Building MultiConverter v2.6.1
 echo (Single File Mode)
 echo ====================================
 echo.
@@ -100,6 +100,7 @@ REM Build the executable with --onefile
     --hidden-import=exporters.ae_exporter ^
     --hidden-import=exporters.usd_exporter ^
     --hidden-import=exporters.maya_ma_exporter ^
+    --hidden-import=exporters.fbx_exporter ^
     --hidden-import=alembic ^
     --hidden-import=alembic.Abc ^
     --hidden-import=alembic.AbcGeom ^
@@ -157,10 +158,12 @@ if "%USD_AVAILABLE%"=="YES" (
     echo   - USD .usdc export
     echo   - Maya USD export
     echo   - Maya MA export
+    echo   - FBX export (Unreal Engine)
 ) else (
     echo   x USD export (library not found)
     echo   x Maya export (library not found)
     echo   - Maya MA export
+    echo   - FBX export (Unreal Engine)
 )
 
 echo.

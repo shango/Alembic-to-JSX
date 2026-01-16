@@ -1,13 +1,13 @@
 @echo off
 REM ==============================================================================
-REM MultiConverter v2.5.0 - Windows Setup Script
+REM MultiConverter v2.6.1 - Windows Setup Script
 REM ==============================================================================
 REM This script sets up everything needed to build the Windows executable
 REM Includes USD library setup for multi-format export
 REM ==============================================================================
 
 echo ====================================
-echo MultiConverter v2.5.0 - Windows Setup
+echo MultiConverter v2.6.1 - Windows Setup
 echo ====================================
 echo.
 
