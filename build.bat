@@ -14,7 +14,7 @@ echo.
 REM Check if venv exists
 if not exist "venv" (
     echo ERROR: Virtual environment not found!
-    echo Please run setup_windows_v2.1.bat first
+    echo Please run setup.bat first
     pause
     exit /b 1
 )
@@ -46,14 +46,13 @@ python -c "from pxr import Usd" >nul 2>&1
 if errorlevel 1 (
     echo WARNING: USD library not found
     echo   USD and Maya export will not be available in the executable
-    echo   To add USD support, run setup_windows_v2.1.bat and install USD
+    echo   To add USD support, run setup.bat and install USD
     echo.
     set USD_AVAILABLE=NO
 ) else (
     echo USD library found - Multi-format export enabled
     echo.
     echo WARNING: --onefile mode may have issues with USD DLLs
-    echo If the executable fails to run, try build_windows_v2.1_onedir.bat instead
     set USD_AVAILABLE=YES
 )
 
@@ -130,10 +129,8 @@ if errorlevel 1 (
     echo ====================================
     echo.
     echo Common issues:
-    echo   - Missing dependencies: Run setup_windows_v2.1.bat
+    echo   - Missing dependencies: Run setup.bat
     echo   - Import errors: Check that all modules are in place
-    echo.
-    echo If --onefile fails, try build_windows_v2.1_onedir.bat instead
     echo.
     pause
     exit /b 1
@@ -172,13 +169,5 @@ echo   - Distribute: dist\MultiConverter.exe (single file!)
 echo   - Users need: Microsoft Visual C++ Redistributable 2015-2022
 echo     Download: https://aka.ms/vs/17/release/vc_redist.x64.exe
 echo.
-
-if "%USD_AVAILABLE%"=="YES" (
-    echo.
-    echo NOTE: If the executable crashes or fails to start,
-    echo USD DLLs may not be loading correctly in --onefile mode.
-    echo Try build_windows_v2.1_onedir.bat for better compatibility.
-    echo.
-)
 
 pause

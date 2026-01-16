@@ -1,13 +1,13 @@
 @echo off
 REM ==============================================================================
-REM MultiConverter v2.1.0 - Windows Setup Script
+REM MultiConverter v2.5.0 - Windows Setup Script
 REM ==============================================================================
 REM This script sets up everything needed to build the Windows executable
 REM Includes USD library setup for multi-format export
 REM ==============================================================================
 
 echo ====================================
-echo MultiConverter v2.1.0 - Windows Setup
+echo MultiConverter v2.5.0 - Windows Setup
 echo ====================================
 echo.
 
@@ -240,7 +240,7 @@ echo ====================================
 echo.
 echo Next steps:
 echo   1. Test the GUI: python a2j_gui.py
-echo   2. Build executable: build_windows_v2.1.bat
+echo   2. Build executable: build.bat
 echo.
 echo Installed components:
 echo   ✓ Python virtual environment

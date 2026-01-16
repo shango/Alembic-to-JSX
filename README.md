@@ -11,23 +11,19 @@ Convert Alembic (.abc) and USD (.usd/.usda/.usdc) files to After Effects JSX, US
 - **Animation Intelligence** - Auto-detects vertex deformation vs transform-only animation
 - **Multi-DCC Support** - Works with Alembic from SynthEyes, Nuke, Maya, Houdini, and more
 - **Cameras & Geometry** - Full animation support with automatic coordinate conversion
-- **User-Friendly** - Modern GUI or powerful CLI
+- **User-Friendly** - Modern GUI with dark theme
 - **Standalone Builds** - Distribute as .exe with no dependencies
 
 ## Quick Start (Windows)
 
 ```cmd
-setup_windows_v2.1.bat    # One-time setup (installs dependencies + USD)
-build_windows_v2.1.bat    # Build MultiConverter.exe
+setup.bat    # One-time setup (installs dependencies + USD)
+build.bat    # Build MultiConverter.exe
 ```
-
-Or use the all-in-one script: `build_all_windows.bat`
 
 See [WINDOWS_BUILD.md](WINDOWS_BUILD.md) for detailed build instructions.
 
 ## Usage
-
-### GUI
 
 1. Launch `MultiConverter.exe` (or `python a2j_gui.py` from source)
 2. Select input scene file (`.abc`, `.usd`, `.usda`, `.usdc`)
@@ -38,22 +34,6 @@ See [WINDOWS_BUILD.md](WINDOWS_BUILD.md) for detailed build instructions.
 7. Import result files into your DCC:
    - **After Effects**: File > Scripts > Run Script File
    - **Maya/Houdini**: File > Import > Select .usdc file
-
-### CLI
-
-```cmd
-# Export all formats from Alembic
-python a2j.py scene.abc --output-dir ./export --shot-name shot_010
-
-# Export from USD to specific formats
-python a2j.py scene.usd --output-dir ./export --format ae maya_ma
-
-# Custom settings
-python a2j.py scene.abc --output-dir ./export --fps 30 --frames 240
-
-# Help
-python a2j.py --help
-```
 
 **Output structure:**
 ```
@@ -99,20 +79,18 @@ output_dir/
 Run the setup script:
 
 ```cmd
-setup_windows_v2.1.bat
+setup.bat
 ```
-
-Or use `build_all_windows.bat` to setup and build in one step.
 
 See [WINDOWS_BUILD.md](WINDOWS_BUILD.md) for detailed instructions.
 
-## Building Executables
+## Building Executable
 
 ```cmd
-build_windows_v2.1.bat
+build.bat
 ```
 
-Output: `dist/MultiConverter/MultiConverter.exe` (~70-100 MB folder)
+Output: `dist/MultiConverter.exe` (single file)
 
 End users only need **Visual C++ Redistributable 2015-2022**.
 
@@ -120,24 +98,14 @@ End users only need **Visual C++ Redistributable 2015-2022**.
 
 ```
 alembic_to_jsx/
-├── readers/           # Input readers (Alembic, USD)
-├── core/              # Core utilities (animation detection)
-├── exporters/         # Format exporters (AE, USD, Maya MA)
+├── readers/              # Input readers (Alembic, USD)
+├── core/                 # Core utilities (animation detection)
+├── exporters/            # Format exporters (AE, USD, Maya MA)
 ├── alembic_converter.py  # Main orchestrator
-├── a2j_gui.py         # GUI application
-├── a2j.py             # CLI application
-└── [build and setup scripts]
+├── a2j_gui.py            # GUI application
+├── setup.bat             # Windows setup script
+└── build.bat             # Windows build script
 ```
-
-## Development
-
-Run from source:
-```cmd
-call venv\Scripts\activate.bat
-python a2j_gui.py
-```
-
-Modular architecture with `readers/` for input formats, `core/` utilities, and `exporters/` for output formats.
 
 ## License
 
