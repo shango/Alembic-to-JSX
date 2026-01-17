@@ -50,6 +50,41 @@ Alembic is an open-source geometry caching format developed by Sony Pictures Ima
 | **Constraints & Expressions** | **FAILS** | Procedural relationships not stored |
 | **Materials & Shaders** | **FAILS** | Only material names, no shader networks |
 
+### Hierarchy & Parenting - What's Actually Preserved
+
+**Common Misconception**: "Alembic loses all hierarchy" - This is NOT entirely true.
+
+**What IS Preserved:**
+```
+✅ Parent-child object structure (the scene tree)
+✅ Transform inheritance (child moves with parent)
+✅ Object names at each hierarchy level
+✅ Nested group structures
+```
+
+**What is NOT Preserved:**
+```
+❌ Dynamic constraints (parent constraint switching between targets)
+❌ Skeleton joints (for skinned characters - typically not exported)
+❌ Constraint logic (point, orient, aim constraints)
+❌ Set-driven relationships
+❌ Expression-based parenting
+```
+
+**Hierarchy Examples:**
+
+| Scenario | Result in Alembic |
+|----------|-------------------|
+| Camera → Dolly Null → Track Null | ✅ Full hierarchy, transforms work correctly |
+| Props nested in Set groups | ✅ Hierarchy preserved, can traverse parent chain |
+| Object with parent constraint | ⚠️ Baked to world space OR follows one target (depends on export settings) |
+| Character skeleton joints | ❌ Usually not exported - only final mesh |
+| Object switching parents mid-animation | ❌ Only baked world-space result |
+
+**The Key Point**: Alembic preserves *static hierarchical structure* but not *dynamic constraint-based relationships*. If an object's parent never changes, hierarchy works fine. If relationships are procedural or switch during animation, only the computed result is stored.
+
+---
+
 ### The Character Rig Problem - Detailed
 
 When a character is exported from Maya to Alembic:
